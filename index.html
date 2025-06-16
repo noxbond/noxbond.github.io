@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoxBond's GitHub Pages Archives</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for consistency across browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2d3748; /* Darker gray for track */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a5568; /* Medium gray for thumb */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096; /* Lighter gray on hover */
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 min-h-screen flex flex-col items-center p-4">
+
+    <!-- Main Container -->
+    <div class="bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-6xl mx-auto flex flex-col md:flex-row gap-6 border border-gray-700">
+
+        <!-- Left Panel: PDF List -->
+        <div class="flex-1 bg-gray-900 p-6 rounded-lg border border-gray-700 shadow-inner">
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500 mb-6 text-center">NoxBond's GitHub Archives</h1>
+            <p class="text-sm text-gray-400 mb-4 text-center">
+                Files are pulled directly from your GitHub repository.
+                Updates will appear on page load after you commit new files.
+            </p>
+
+            <!-- PDF List Section -->
+            <div>
+                <h2 class="text-xl font-semibold text-yellow-400 mb-3">Available PDFs</h2>
+                <ul id="pdfList" class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                    <li class="text-gray-500 text-center py-4">Loading PDFs...</li>
+                </ul>
+                <p id="statusMessage" class="text-sm text-gray-400 mt-3 text-center"></p>
+            </div>
+        </div>
+
+        <!-- Right Panel: PDF Viewer -->
+        <div class="flex-1 bg-gray-900 p-6 rounded-lg border border-gray-700 shadow-inner flex flex-col items-center justify-center">
+            <h2 class="text-xl font-semibold text-yellow-400 mb-4">PDF Viewer</h2>
+            <div id="pdfViewerContainer" class="w-full h-full min-h-[500px] flex items-center justify-center bg-gray-700 rounded-lg overflow-hidden border border-gray-600">
+                <iframe id="pdfFrame" class="w-full h-full hidden" allowfullscreen></iframe>
+                <p id="viewerPlaceholder" class="text-gray-400 text-center p-4">Select a PDF from 'Available PDFs' to view it here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration for your GitHub repository
+        const githubUsername = 'noxbond'; // Your GitHub username
+        const githubRepoName = 'noxbond.github.io'; // Your GitHub Pages repository name (e.g., 'noxbond.github.io')
+        const pdfFolderPath = 'pdfs'; // Subfolder where your PDFs will be stored (e.g., 'pdfs' or 'documents')
+
+        // UI Elements
+        const pdfList = document.getElementById('pdfList');
+        const pdfFrame = document.getElementById('pdfFrame');
+        const viewerPlaceholder = document.getElementById('viewerPlaceholder');
+        const statusMessage = document.getElementById('statusMessage');
+
+        /**
+         * Fetches and displays the list of PDF files from the GitHub repository.
+         */
+        const fetchPdfsFromGitHub = async () => {
+            pdfList.innerHTML = '<li class="text-gray-500 text-center py-4">Loading PDFs...</li>';
+            statusMessage.textContent = ''; // Clear previous status
+
+            // GitHub API endpoint for repository contents
+            const apiUrl = `https://api.github.com/repos/${githubUsername}/${githubRepoName}/contents/${pdfFolderPath}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json' // Specify GitHub API version
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        statusMessage.textContent = `Error: Folder '${pdfFolderPath}' not found in repository. Please ensure it exists and contains PDFs.`;
+                    } else {
+                        statusMessage.textContent = `Error fetching PDFs: ${response.statusText}. Rate limit issues?`;
+                    }
+                    pdfList.innerHTML = '<li class="text-gray-500 text-center py-4">Failed to load PDFs.</li>';
+                    console.error("GitHub API response not OK:", response.status, response.statusText);
+                    return;
+                }
+
+                const data = await response.json();
+
+                // Filter for PDF files and sort alphabetically
+                const pdfs = data.filter(item => item.type === 'file' && item.name.endsWith('.pdf'))
+                                 .sort((a, b) => a.name.localeCompare(b.name));
+
+                if (pdfs.length === 0) {
+                    pdfList.innerHTML = '<li class="text-gray-500 text-center py-4">No PDF files found in the specified folder.</li>';
+                    return;
+                }
+
+                // Clear list before adding new items
+                pdfList.innerHTML = ''; 
+
+                pdfs.forEach(pdf => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center bg-gray-800 p-3 rounded-lg shadow-sm hover:bg-gray-700 transition duration-200 cursor-pointer border border-gray-700';
+                    
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'text-blue-400 font-medium truncate flex-grow';
+                    nameSpan.textContent = pdf.name;
+                    nameSpan.title = pdf.name; // For full name on hover
+
+                    // The raw_url points directly to the file content
+                    nameSpan.onclick = () => viewPdf(pdf.download_url); 
+
+                    li.appendChild(nameSpan);
+                    pdfList.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error("Error fetching PDFs:", error);
+                statusMessage.textContent = `Network error or API issue: ${error.message}`;
+                pdfList.innerHTML = '<li class="text-gray-500 text-center py-4">Failed to load PDFs due to an error.</li>';
+            }
+        };
+
+        /**
+         * Displays a PDF in the iframe viewer.
+         * @param {string} url - The URL of the PDF to display.
+         */
+        const viewPdf = (url) => {
+            pdfFrame.src = url;
+            viewerPlaceholder.classList.add('hidden'); // Hide placeholder
+            pdfFrame.classList.remove('hidden'); // Show iframe
+        };
+
+        // Fetch PDFs when the page loads
+        window.onload = fetchPdfsFromGitHub;
+    </script>
+</body>
+</html>
