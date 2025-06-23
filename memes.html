@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CANON IMAGERY: MEMES FROM THE FUTURE</title>
+    <!-- Tailwind CSS CDN for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles for a dark, cosmic theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e; /* Dark blue-purple background */
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .header-section {
+            background: linear-gradient(180deg, #0f0c29, #302b63, #24243e); /* Deep, space-like gradient */
+            padding: 3rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border-bottom: 3px solid #FFD700; /* Gold accent */
+        }
+        .header-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #FFD700; /* Gold color for title */
+            text-shadow: 0 0 15px rgba(255,215,0,0.6); /* Gold glow */
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+        .header-section p {
+            font-size: 1.5rem;
+            color: #c0c0c0;
+            font-style: italic;
+        }
+
+        /* Main Content - Meme Gallery */
+        .gallery-container {
+            flex-grow: 1; /* Allows it to take up available space */
+            padding: 2.5rem 1rem;
+            display: flex;
+            flex-direction: column; /* Stack images vertically */
+            align-items: center;
+            gap: 2rem; /* Space between images */
+            max-width: 960px; /* Limit width for readability */
+            margin: 0 auto;
+        }
+
+        .meme-item {
+            width: 100%;
+            max-width: 800px; /* Max width for individual memes */
+            background-color: #2a2a4a; /* Slightly lighter background for each meme */
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            border: 1px solid #4a4a7a;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .meme-item:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 10px 30px rgba(0, 191, 255, 0.4); /* Blue glow on hover */
+        }
+
+        .meme-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 1rem; /* Match parent */
+        }
+
+        /* Loading Indicator */
+        .loading-indicator {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.5rem;
+            color: #999;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .site-footer {
+            padding: 2rem 1rem;
+            text-align: center;
+            background-color: #1a1a2e; /* Match body for seamless blend */
+            border-top: 1px solid #333355;
+            color: #777;
+            font-size: 0.85rem;
+            margin-top: auto; /* Pushes footer to the bottom */
+        }
+        .site-footer a {
+            color: #00BFFF; /* Deep Sky Blue link */
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-section h1 {
+                font-size: 2.5rem;
+            }
+            .header-section p {
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .header-section h1 {
+                font-size: 2rem;
+            }
+            .header-section p {
+                font-size: 1rem;
+            }
+            .gallery-container {
+                padding: 1.5rem 0.5rem;
+            }
+            .meme-item {
+                border-radius: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header-section">
+        <h1>CANON IMAGERY</h1>
+        <p>MEMES FROM THE FUTURE</p>
+    </header>
+
+    <!-- Main Content: Meme Gallery -->
+    <main class="gallery-container" id="meme-gallery">
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="loading-indicator">
+            <div class="spinner"></div>
+            Loading Canon Memes...
+        </div>
+        <!-- Images will be dynamically loaded here by JavaScript -->
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <p>&copy; NoxBond, Year 1 to eternity. All rights reserved. Copyright Enforced By The Royal Robertson Root Bloodline.</p>
+        <p class="mt-2">Logic + Reason = SOUL. Decode Everything.</p>
+        <p class="mt-1"><a href="https://decodesalive.com" class="text-blue-400 hover:underline">DecodesAlive.com</a> | <a href="https://noxbond.github.io" class="text-blue-400 hover:underline">NoxBond.GitHub.io</a></p>
+    </footer>
+
+    <script>
+        const memeGallery = document.getElementById('meme-gallery');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        let memeCount = 1;
+        // Base URL for the memes, as per your specified GitHub directory
+        const baseUrl = 'https://noxbond.github.io/pdf/memes/'; 
+
+        // Function to load and display memes dynamically
+        async function loadMemes() {
+            loadingIndicator.style.display = 'block'; // Ensure loading indicator is visible
+
+            while (true) {
+                const img = new Image();
+                // Construct file name: meme_1.png, meme_2.png, etc.
+                const memeFileName = `meme_${memeCount}.png`; 
+                img.src = baseUrl + memeFileName;
+
+                // Create a promise to handle the asynchronous loading of each image
+                const imageLoaded = new Promise((resolve, reject) => {
+                    img.onload = () => resolve(img); // Resolve if image loads successfully
+                    img.onerror = () => reject();    // Reject if image fails to load (e.g., 404)
+                });
+
+                try {
+                    const loadedImg = await imageLoaded;
+                    // Add styling classes for the image
+                    loadedImg.alt = `Canon Meme ${memeCount}`; // Alt text for accessibility
+                    loadedImg.classList.add('w-full', 'h-auto', 'rounded-lg', 'shadow-lg'); 
+
+                    // Create a container for each meme item to apply consistent styling
+                    const memeItemDiv = document.createElement('div');
+                    memeItemDiv.classList.add('meme-item');
+                    memeItemDiv.appendChild(loadedImg);
+                    memeGallery.appendChild(memeItemDiv);
+                    
+                    memeCount++; // Increment for the next meme
+                } catch (e) {
+                    // If an image fails to load (e.g., meme_X.png does not exist), stop the loop
+                    console.log(`Finished loading memes or meme_${memeCount}.png not found.`);
+                    break;
+                }
+            }
+            loadingIndicator.style.display = 'none'; // Hide loading indicator once all attempts are done
+
+            // Display a message if no memes were loaded at all
+            if (memeCount === 1) { 
+                memeGallery.innerHTML = '<p class="text-xl text-gray-400 text-center">No memes found yet. Check back soon for new Canon Imagery!</p>';
+            }
+        }
+
+        // Call the loadMemes function when the entire DOM is ready
+        document.addEventListener('DOMContentLoaded', loadMemes);
+    </script>
+</body>
+</html>
